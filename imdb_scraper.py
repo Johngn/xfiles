@@ -35,13 +35,18 @@ def get_episodes(show, slp_time):
     
     time.sleep(slp_time)
     
-    num_episodes = driver.find_element_by_xpath(".//span[@class='bp_sub_heading']").text
-    print(num_episodes)
+    num_episodes_text = driver.find_element_by_xpath(".//span[@class='bp_sub_heading']").text
+    num_episodes = re.findall(r'\d+', num_episodes_text)[0]
     
-    # click on link to season 1
-    driver.find_element_by_xpath(".//div[@class='seasons-and-year-nav']/div[3]/a[last()]").click()
+    # click on link to last season
+    driver.find_element_by_xpath(".//div[@class='seasons-and-year-nav']/div[3]/a[1]").click()
     
     time.sleep(slp_time)
+    
+    # select menu for first season
+    driver.find_element_by_xpath(".//select[@id='bySeason']/option[1]").click()
+    
+    time.sleep(slp_time*2) # need extra long sleep time here for select menu to work
     
     # click on link to individual episodes
     driver.find_element_by_xpath(".//div[@class='info']/strong[1]/a[1]").click()
@@ -68,24 +73,22 @@ def get_episodes(show, slp_time):
             "description" : description
         })
         
-        print("Progress: {}".format("" + str(len(episodes))))
+        print("Progress: {}".format("" + str(len(episodes)) + '/' + num_episodes) + " episodes")
 
-        #Clicking on the "next page" button
-        
-        try:
+        #Clicking on the "next episode" button
+        if len(episodes) < int(num_episodes):
             driver.find_element_by_xpath(".//a[@class='bp_item np_next']").click()
-        except NoSuchElementException:
+        else:
             print("Scraping finished")
             break
 
-    return pd.DataFrame(episodes)  #This line converts the dictionary object into a pandas DataFrame.
+    return pd.DataFrame(episodes)
 
 
-# show = sys.argv[1]
-show = "father ted"
-slp_time = 1
+show = sys.argv[1]
+slp_time = 2
 
 df = get_episodes(show, slp_time)
 
-df.to_csv("./" + show + '.csv')
+df.to_csv('./' + show + '_episodes.csv', index=False)
 
