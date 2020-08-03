@@ -14,7 +14,7 @@ import pandas as pd
 import re
 import sys
 
-def get_episodes(show, slp_time):
+def get_episodes(show, sleep_time):
     
     driver = webdriver.Chrome('./chromedriver')
     driver.set_window_size(1000, 1000)
@@ -28,12 +28,12 @@ def get_episodes(show, slp_time):
     search_box.send_keys(show)
     search_box.send_keys(Keys.RETURN)
     
-    time.sleep(slp_time)
+    time.sleep(sleep_time)
     
     # click on show (first result)
     driver.find_element_by_xpath(".//table[@class='findList']/tbody[1]/tr[1]/td[1]/a[1]").click()
     
-    time.sleep(slp_time)
+    time.sleep(sleep_time)
     
     num_episodes_text = driver.find_element_by_xpath(".//span[@class='bp_sub_heading']").text
     num_episodes = re.findall(r'\d+', num_episodes_text)[0]
@@ -41,12 +41,12 @@ def get_episodes(show, slp_time):
     # click on link to last season
     driver.find_element_by_xpath(".//div[@class='seasons-and-year-nav']/div[3]/a[1]").click()
     
-    time.sleep(slp_time)
+    time.sleep(sleep_time)
     
     # select menu for first season
     driver.find_element_by_xpath(".//select[@id='bySeason']/option[1]").click()
     
-    time.sleep(slp_time*2) # need extra long sleep time here for select menu to work
+    time.sleep(sleep_time*2) # need extra long sleep time here for select menu to work
     
     # click on link to individual episodes
     driver.find_element_by_xpath(".//div[@class='info']/strong[1]/a[1]").click()
@@ -54,7 +54,7 @@ def get_episodes(show, slp_time):
     episodes = []    
 
     while True:
-        time.sleep(slp_time)
+        time.sleep(sleep_time)
         
         season, ep_num = driver.find_element_by_xpath(".//div[@class='bp_heading']").text.split(" | ")
         title = driver.find_element_by_xpath(".//div[@class='title_wrapper']/h1[1]").text
@@ -79,16 +79,16 @@ def get_episodes(show, slp_time):
         if len(episodes) < int(num_episodes):
             driver.find_element_by_xpath(".//a[@class='bp_item np_next']").click()
         else:
-            print("Scraping finished")
+            print("Finished")
             break
 
     return pd.DataFrame(episodes)
 
-
+# get name of show from command line argument
 show = sys.argv[1]
-slp_time = 2
+sleep_time = 2
 
-df = get_episodes(show, slp_time)
+df = get_episodes(show, sleep_time)
 
 df.to_csv('./' + show + '_episodes.csv', index=False)
 

@@ -11,13 +11,13 @@ ggplot(season1) +
                  size = votes,
                  color = phenomena)) +
   labs(y = "",
-       title = "IMDB ratings of season 1 of the X-files")
+       title = "IMDB ratings of seasons 1 and 2 of the X-files")
 
 ggplot(xfiles_episodes) +
   geom_point(aes(x = number,
                  y = rating,
                  size = votes,
-                 color = phenomena)) +
+                 color = main_story)) +
   labs(x = "",
        y = "",
        title = "IMDB ratings for X-files per season") +
